@@ -1,2 +1,3 @@
-import { withPayload } from '@payloadcms/next/withPayload'
-export default withPayload({ reactStrictMode: true })
+/** @type {import('next').NextConfig} */
+const nextConfig = {}
+export default nextConfig
