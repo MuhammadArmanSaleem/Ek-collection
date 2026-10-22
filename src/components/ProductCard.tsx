@@ -1,0 +1,2 @@
+import Link from 'next/link'
+export default function ProductCard({product}:{product:any}) {const image=product.images?.[0]?.image;return <Link href={'/product/'+product.slug}><div className="product-img">{typeof image==='object'&&image?.url?<img src={image.url} alt={image.alt||product.name}/>:<span style={{color:'#a28e6d',fontFamily:'Georgia,serif'}}>EK COLLECTION</span>}</div><div className="product-name">{product.name}</div><div className="price">Rs. {Number(product.price).toLocaleString('en-PK')}</div></Link>}
