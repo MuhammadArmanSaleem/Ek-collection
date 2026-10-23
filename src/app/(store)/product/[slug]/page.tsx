@@ -14,8 +14,8 @@ export default async function Product({ params }: {params: Promise<{ slug: strin
   const { docs } = await payload.find({ collection:'products', where:{ and:[{slug:{equals:slug}},{status:{equals:'published'}}] }, limit:1, depth:2 })
   const item = docs[0]
   if (!item) notFound()
-  const images = (item.images || []).map(row => row.image).filter((image): image is Exclude<typeof image, number> => typeof image === 'object' && image !== null && !!image.url).map(image => ({ url: image.url!, alt: image.alt || item.name }))
-  const related = (await payload.find({collection:'products', where:{and:[{status:{equals:'published'}},{fabric:{equals:item.fabric}}]}, limit:5, depth:2})).docs.filter(p=>p.id !== item.id).slice(0,4)
+  const images: { url: string; alt: string }[] = (Array.isArray(item.images) ? item.images : []).flatMap((row: any) => { const image = row?.image; return image && typeof image === 'object' && typeof image.url === 'string' ? [{ url: image.url, alt: typeof image.alt === 'string' ? image.alt : String(item.name) }] : [] })
+  const related = (await payload.find({collection:'products', where:{and:[{status:{equals:'published'}},{fabric:{equals:item.fabric}}]}, limit:5, depth:2})).docs.filter((p: any)=>p.id !== item.id).slice(0,4)
   return <main className="page-width detail-page">
     <nav className="breadcrumb"><Link href="/">Home</Link> / <Link href="/shop">The collection</Link> / <Link href={'/shop?fabric='+item.fabric}>{item.fabric}</Link> / {item.name}</nav>
     <div className="detail-grid">
