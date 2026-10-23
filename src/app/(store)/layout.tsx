@@ -1,3 +1,11 @@
 import '../globals.css'
-import Link from 'next/link'
-export default function Layout({children}:{children:React.ReactNode}) {return <html lang="en"><body><div className="announcement">TIMELESS ELEGANCE · PAKISTAN-WIDE DELIVERY</div><header className="header"><Link href="/" className="brand">EK <span>COLLECTION</span></Link><nav><Link href="/">Home</Link><Link href="/shop">Shop All</Link><Link href="/shop?fabric=lawn">Lawn</Link><Link href="/shop?fabric=cotton">Cotton</Link><Link href="/shop?fabric=linen">Linen</Link></nav><Link href="/cart" className="bag">Shopping Bag →</Link></header>{children}<footer><div><strong>EK COLLECTION</strong><p>Elegance in Every Stitch.</p></div><div><Link href="/shop">Shop</Link><Link href="/pages/terms-and-conditions">Terms & Conditions</Link><Link href="/pages/return-refund-policy">Returns & Refunds</Link><Link href="/pages/contact">Contact</Link></div></footer></body></html>}
+import type { Metadata } from 'next'
+import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
+export const metadata: Metadata = {
+  title: { default: 'EK Collection | Unstitched Suits', template: '%s | EK Collection' },
+  description: 'Explore thoughtfully curated unstitched Pakistani three-piece suits in lawn, cotton and linen.',
+}
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <html lang="en"><body><StoreHeader/>{children}<StoreFooter/></body></html>
+}
