@@ -1,5 +1,34 @@
 export const dynamic = 'force-dynamic'
-import {notFound} from 'next/navigation'
-import {cms} from '@/lib/payload'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { ArrowRight } from 'lucide-react'
+import { cms } from '@/lib/payload'
 import AddToCart from '@/components/AddToCart'
-export default async function Product({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const p=await cms();const {docs}=await p.find({collection:'products',where:{and:[{slug:{equals:slug}},{status:{equals:'published'}}]},limit:1,depth:2});const item=docs[0];if(!item)notFound();const image=item.images?.[0]?.image;return <main className="container" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:60}}><div className="product-img">{typeof image==='object'&&image?.url?<img src={image.url} alt={image.alt||item.name}/>:<span>EK COLLECTION</span>}</div><div><p className="eyebrow">EK Collection / {item.fabric}</p><h1 style={{font:'44px Georgia,serif'}}>{item.name}</h1><p className="price" style={{fontSize:24}}>Rs. {item.price.toLocaleString('en-PK')}</p><p>{item.description}</p><p>Fabric: {item.fabric} · Style: {item.style} · {item.pieces} pieces</p><p>{item.stock>0?'In stock':'Out of stock'}</p><AddToCart item={{id:item.id,name:item.name,price:item.price,slug:item.slug}} disabled={item.stock<1}/><p style={{fontSize:12,color:'#777',marginTop:25}}>Actual shades may vary slightly due to lighting and screen settings. Eligible defective-item returns within 7 days.</p></div></main>}
+import ProductGallery from '@/components/ProductGallery'
+import ProductCard from '@/components/ProductCard'
+
+export default async function Product({ params }: {params: Promise<{ slug: string }>}) {
+  const { slug } = await params
+  if (!process.env.PAYLOAD_SECRET || !(process.env.DATABASE_URI || process.env.DATABASE_URL)) notFound()
+  const payload = await cms()
+  const { docs } = await payload.find({ collection:'products', where:{ and:[{slug:{equals:slug}},{status:{equals:'published'}}] }, limit:1, depth:2 })
+  const item = docs[0]
+  if (!item) notFound()
+  const images = (item.images || []).map(row => row.image).filter((image): image is Exclude<typeof image, number> => typeof image === 'object' && image !== null && !!image.url).map(image => ({ url: image.url!, alt: image.alt || item.name }))
+  const related = (await payload.find({collection:'products', where:{and:[{status:{equals:'published'}},{fabric:{equals:item.fabric}}]}, limit:5, depth:2})).docs.filter(p=>p.id !== item.id).slice(0,4)
+  return <main className="page-width detail-page">
+    <nav className="breadcrumb"><Link href="/">Home</Link> / <Link href="/shop">The collection</Link> / <Link href={'/shop?fabric='+item.fabric}>{item.fabric}</Link> / {item.name}</nav>
+    <div className="detail-grid">
+      <ProductGallery images={images} title={item.name}/>
+      <div className="detail-content"><span className="eyebrow">EK COLLECTION · {item.fabric} EDIT</span><h1>{item.name}</h1><div className="detail-price">PKR {Number(item.price).toLocaleString('en-PK')}</div><p className="detail-description">{item.description || 'An elegant unstitched piece from the EK Collection.'}</p>
+        <div className="detail-divider"/>
+        <dl className="spec-list"><div><dt>Fabric</dt><dd>{item.fabric}</dd></div><div><dt>Design</dt><dd>{item.style}</dd></div><div><dt>Pieces</dt><dd>{item.pieces || 3}-piece unstitched</dd></div><div><dt>Availability</dt><dd className={'stock-indicator'+(item.stock>0?'':' sold')}>{item.stock>0?'IN STOCK':'OUT OF STOCK'}</dd></div></dl>
+        <div className="detail-divider"/>
+        <AddToCart item={{id:item.id,name:item.name,price:Number(item.price),slug:item.slug,image:images[0]?.url}} disabled={item.stock<1}/>
+        <p className="detail-note">This item is unstitched and supplied as fabric. Stitching and tailoring services are not included. Actual shades may vary slightly due to lighting and screen settings. Delivery charges are confirmed before dispatch.</p>
+        <div className="detail-divider"/><Link className="text-link" href="/pages/return-refund-policy">RETURNS & REFUNDS <ArrowRight size={15}/></Link>
+      </div>
+    </div>
+    {related.length>0 && <section className="section" style={{paddingBottom:0}}><div className="related-heading"><div><span className="eyebrow">YOU MAY ALSO LIKE</span><h2>Explore similar pieces</h2></div><Link className="text-link" href={'/shop?fabric='+item.fabric}>VIEW THE EDIT <ArrowRight size={15}/></Link></div><div className="product-grid">{related.map(p=><ProductCard key={p.id} product={p}/>)}</div></section>}
+  </main>
+}
