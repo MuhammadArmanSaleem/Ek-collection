@@ -5,10 +5,10 @@ import { cms } from '@/lib/payload'
 import ProductCard from '@/components/ProductCard'
 import { lookbook } from '@/lib/demo-images'
 
-type Search = { fabric?: string; style?: string; q?: string; page?: string }
+type ShopQuery = { fabric?: string; style?: string; q?: string; page?: string }
 const fabrics = ['lawn','cotton','linen']
 const styles = ['embroidered','printed','plain']
-export default async function Shop({ searchParams }: { searchParams: Promise<Search> }) {
+export default async function Shop({ searchParams }: { searchParams: Promise<ShopQuery> }) {
   const raw = await searchParams
   const fabric = fabrics.includes(raw.fabric || '') ? raw.fabric : undefined
   const style = styles.includes(raw.style || '') ? raw.style : undefined
