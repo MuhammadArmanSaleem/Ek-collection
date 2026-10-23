@@ -7,7 +7,7 @@ export function getProductImage(product: ShopProduct): string | undefined {
   const image = product.images?.[0]?.image
   return typeof image === 'object' && image !== null && image.url ? image.url : undefined
 }
-export default function ProductCard({ product }: { product: ShopProduct }) {
+export default function ProductCard({ product }: { product: any }) {
   const image = getProductImage(product)
   return <article className="product-card"><Link href={'/product/' + product.slug} className="product-media">
     {image ? <img src={image} alt={product.name} loading="lazy"/> : <div className="product-image-fallback"><span>EK</span><small>Product photo coming soon</small></div>}
