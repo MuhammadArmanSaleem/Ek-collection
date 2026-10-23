@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic'
 import {notFound} from 'next/navigation'
-import {cms} from '@/lib/payload'
-import {RichText} from '@payloadcms/richtext-lexical/react'
-export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const payload=await cms();const {docs}=await payload.find({collection:'pages',where:{slug:{equals:slug}},limit:1});if(!docs[0])notFound();return <main className="container legal"><h1>{docs[0].title}</h1>{docs[0].content?<RichText data={docs[0].content}/>:null}</main>}
+import {policies} from '@/lib/catalog'
+export function generateStaticParams(){return Object.keys(policies).map(slug=>({slug}))}
+export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const policy=policies[slug];if(!policy)notFound();return <main className="container legal"><h1>{policy.title}</h1>{policy.body.map((paragraph,i)=><p key={i}>{paragraph}</p>)}</main>}
