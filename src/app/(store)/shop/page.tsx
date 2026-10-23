@@ -19,9 +19,7 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Sho
   if (fabric) conditions.push({ fabric: { equals: fabric } })
   if (style) conditions.push({ style: { equals: style } })
   if (q) conditions.push({ name: { contains: q } })
-  const result = configured ? await (await cms()).find({
-    collection:'products', where:{and:conditions}, limit:12, page, sort:'-createdAt', depth:2,
-  }) : { docs: [], totalDocs: 0, totalPages: 1, page: 1 }
+  const result = configured ? await (async () => { try { return await (await cms()).find({ collection:'products', where:{and:conditions}, limit:12, page, sort:'-createdAt', depth:2 }) } catch (error) { console.error('Catalog unavailable', error); return { docs: [], totalDocs: 0, totalPages: 1, page: 1 } } })() : { docs: [], totalDocs: 0, totalPages: 1, page: 1 }
   const filters = [
     ['All Suits','/shop',!fabric&&!style],
     ['Lawn','/shop?fabric=lawn',fabric==='lawn'],

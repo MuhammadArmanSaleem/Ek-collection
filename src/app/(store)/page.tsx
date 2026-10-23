@@ -7,9 +7,7 @@ import ProductCard from '@/components/ProductCard'
 
 export default async function Home() {
   const hasDatabase = !!(process.env.PAYLOAD_SECRET && (process.env.DATABASE_URI || process.env.DATABASE_URL))
-  const docs = hasDatabase ? (await (await cms()).find({
-    collection: 'products', where: { status: { equals: 'published' } }, sort: '-createdAt', limit: 8, depth: 2,
-  })).docs : []
+  const docs = hasDatabase ? await (async () => { try { return (await (await cms()).find({ collection: 'products', where: { status: { equals: 'published' } }, sort: '-createdAt', limit: 8, depth: 2 })).docs } catch (error) { console.error('Homepage catalog unavailable', error); return [] } })() : []
   return <main>
     <section className="hero">
       <img className="hero-photo" src={demoImages.hero} alt="Editorial inspiration showing an elegant unstitched outfit" />

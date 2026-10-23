@@ -34,7 +34,7 @@ const defaults: Record<string, { title: string; intro: string; sections: { headi
 export default async function Page({params}:{params:Promise<{slug:string}>}) {
   const {slug}=await params
   const configured = !!(process.env.PAYLOAD_SECRET && (process.env.DATABASE_URI || process.env.DATABASE_URL))
-  const docs = configured ? (await (await cms()).find({collection:'pages',where:{slug:{equals:slug}},limit:1,depth:1})).docs : []
+  const docs = configured ? await (async () => { try { return (await (await cms()).find({collection:'pages',where:{slug:{equals:slug}},limit:1,depth:1})).docs } catch (error) { console.error('CMS pages unavailable', error); return [] } })() : []
   const page = docs[0]
   if (page) return <main className="page-width policy-page"><p className="eyebrow">EK COLLECTION / INFORMATION</p><h1>{page.title}</h1>{page.content ? <RichText data={page.content}/> : null}</main>
 
