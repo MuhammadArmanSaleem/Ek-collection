@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import {notFound} from 'next/navigation'
 import {cms} from '@/lib/payload'
 import {RichText} from '@payloadcms/richtext-lexical/react'
